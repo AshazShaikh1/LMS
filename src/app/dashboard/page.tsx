@@ -56,6 +56,7 @@ export default async function DashboardPage() {
 
     let announcements: any[] = []
     let pendingAssignmentsCount = 0
+    let averageGrade = '—'
 
     if (enrolledCourseIds.length > 0) {
       const { data: annData } = await supabase
@@ -73,19 +74,37 @@ export default async function DashboardPage() {
       // Fetch assignments to calculate pending assignments
       const { data: courseAssignments } = await supabase
         .from('assignments')
-        .select('id, due_date')
+        .select('id, max_marks, due_date')
         .in('course_id', enrolledCourseIds)
 
       if (courseAssignments && courseAssignments.length > 0) {
         const assignmentIds = courseAssignments.map((a) => a.id)
         const { data: userSubs } = await supabase
           .from('submissions')
-          .select('assignment_id')
+          .select('assignment_id, marks')
           .eq('student_id', user.id)
           .in('assignment_id', assignmentIds)
 
         const submittedIds = new Set((userSubs || []).map((s) => s.assignment_id))
         pendingAssignmentsCount = courseAssignments.filter((a) => !submittedIds.has(a.id)).length
+
+        // Compute average grade
+        const gradedSubs = (userSubs || []).filter((s) => s.marks !== null && s.marks !== undefined)
+        if (gradedSubs.length > 0) {
+          const assignMap = new Map(courseAssignments.map((a) => [a.id, a.max_marks]))
+          let earned = 0
+          let possible = 0
+          gradedSubs.forEach((s) => {
+            const max = assignMap.get(s.assignment_id) || 100
+            earned += s.marks!
+            possible += max
+          })
+          if (possible > 0) {
+            const pct = Math.round((earned / possible) * 100)
+            const letter = pct >= 90 ? 'A+' : pct >= 80 ? 'A' : pct >= 70 ? 'B' : pct >= 60 ? 'C' : 'D'
+            averageGrade = `${pct}% (${letter})`
+          }
+        }
       }
     }
 
@@ -95,6 +114,7 @@ export default async function DashboardPage() {
         enrolledCourses={enrolledCourses}
         announcements={announcements}
         pendingAssignmentsCount={pendingAssignmentsCount}
+        averageGrade={averageGrade}
       />
     )
   }
@@ -125,9 +145,9 @@ export default async function DashboardPage() {
       enrollmentCount: counts[c.id] || 0,
     }))
 
-    // Count all submissions received across teacher's assignments
+    // Count pending ungraded submissions across teacher's assignments
     const teacherCourseIds = (teachingCourses || []).map((c) => c.id)
-    let totalSubmissionsCount = 0
+    let pendingGradingCount = 0
 
     if (teacherCourseIds.length > 0) {
       const { data: teacherAssignments } = await supabase
@@ -141,8 +161,9 @@ export default async function DashboardPage() {
           .from('submissions')
           .select('*', { count: 'exact', head: true })
           .in('assignment_id', assignIds)
+          .is('marks', null)
 
-        totalSubmissionsCount = count || 0
+        pendingGradingCount = count || 0
       }
     }
 
@@ -150,7 +171,7 @@ export default async function DashboardPage() {
       <TeacherDashboard
         profile={profile}
         teachingCourses={coursesWithCounts}
-        pendingSubmissionsCount={totalSubmissionsCount}
+        pendingSubmissionsCount={pendingGradingCount}
       />
     )
   }

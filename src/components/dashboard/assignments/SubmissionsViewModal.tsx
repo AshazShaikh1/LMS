@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { Submission, Assignment } from '@/types'
 import { getSubmissionDownloadUrl } from '@/app/dashboard/assignments/actions'
-import { X, Users, Download, Clock, AlertTriangle, FileText, CheckCircle } from 'lucide-react'
+import { GradeSubmissionModal } from '@/components/dashboard/grades/GradeSubmissionModal'
+import { X, Users, Download, Clock, AlertTriangle, FileText, CheckCircle, Award } from 'lucide-react'
 
 interface SubmissionsViewModalProps {
   assignment: Assignment
@@ -20,6 +21,7 @@ export function SubmissionsViewModal({
 }: SubmissionsViewModalProps) {
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const [downloadError, setDownloadError] = useState<string | null>(null)
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
 
   if (!isOpen) return null
 
@@ -131,16 +133,44 @@ export function SubmissionsViewModal({
                           {submittedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
+
+                      {/* Grade & Feedback status */}
+                      <div className="pt-1 flex items-center gap-2">
+                        {sub.marks !== null && sub.marks !== undefined ? (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-700 border border-amber-200">
+                            Score: {sub.marks} / {assignment.max_marks} ({Math.round((sub.marks / assignment.max_marks) * 100)}%)
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">
+                            Ungraded
+                          </span>
+                        )}
+                        {sub.feedback && (
+                          <span className="text-xs text-slate-500 italic truncate max-w-xs">
+                            &ldquo;{sub.feedback}&rdquo;
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    <button
-                      onClick={() => handleDownload(sub.id, sub.file_name)}
-                      disabled={downloadingId === sub.id}
-                      className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-lg bg-indigo-50 border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 transition disabled:opacity-50"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                      {downloadingId === sub.id ? 'Loading...' : 'Download File'}
-                    </button>
+                    <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                      <button
+                        onClick={() => handleDownload(sub.id, sub.file_name)}
+                        disabled={downloadingId === sub.id}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 transition disabled:opacity-50"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        {downloadingId === sub.id ? 'Loading...' : 'Download'}
+                      </button>
+
+                      <button
+                        onClick={() => setSelectedSubmission(sub)}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 shadow-xs transition"
+                      >
+                        <Award className="h-3.5 w-3.5" />
+                        {sub.marks !== null && sub.marks !== undefined ? 'Edit Grade' : 'Grade'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )
@@ -158,6 +188,18 @@ export function SubmissionsViewModal({
           </button>
         </div>
       </div>
+
+      {selectedSubmission && (
+        <GradeSubmissionModal
+          submission={selectedSubmission}
+          maxMarks={assignment.max_marks}
+          isOpen={!!selectedSubmission}
+          onClose={() => setSelectedSubmission(null)}
+          onSuccess={() => {
+            setSelectedSubmission(null)
+          }}
+        />
+      )}
     </div>
   )
 }

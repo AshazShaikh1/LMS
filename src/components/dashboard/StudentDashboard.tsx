@@ -16,6 +16,7 @@ interface StudentDashboardProps {
   enrolledCourses?: (Course & { enrollmentCount?: number })[]
   announcements?: Announcement[]
   pendingAssignmentsCount?: number
+  averageGrade?: string
 }
 
 export function StudentDashboard({
@@ -23,6 +24,7 @@ export function StudentDashboard({
   enrolledCourses = [],
   announcements = [],
   pendingAssignmentsCount = 0,
+  averageGrade = '—',
 }: StudentDashboardProps) {
   const stats = [
     {
@@ -48,7 +50,7 @@ export function StudentDashboard({
     },
     {
       label: 'Average Grade',
-      value: '—',
+      value: averageGrade,
       description: 'Overall semester GPA',
       icon: GraduationCap,
       color: 'text-emerald-600 bg-emerald-50 border-emerald-100',
