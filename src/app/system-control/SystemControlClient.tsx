@@ -35,7 +35,7 @@ export function SystemControlClient({
   const [actionSuccess, setActionSuccess] = useState<string | null>(null)
 
   // Login form state (if not authenticated as owner)
-  const [loginEmail, setLoginEmail] = useState('ashazshaikh111@gmail.com')
+  const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
   const [loginError, setLoginError] = useState<string | null>(null)
   const [isLoggingIn, setIsLoggingIn] = useState(false)
@@ -123,7 +123,7 @@ export function SystemControlClient({
                 Owner Authentication Required
               </h2>
               <p className="text-xs sm:text-sm text-slate-400">
-                This console holds root power to take the entire website down or bring it back online. Access is strictly restricted to <strong>ashazshaikh111@gmail.com</strong>.
+                This console holds root power to take the entire website down or bring it back online. Access is strictly restricted to the authorized system owner.
               </p>
               {currentEmail && (
                 <div className="inline-block rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 text-xs text-amber-400">
@@ -148,7 +148,8 @@ export function SystemControlClient({
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-3 text-sm text-white focus:border-red-500 focus:outline-hidden"
-                  placeholder="ashazshaikh111@gmail.com"
+                  placeholder="Enter authorized owner email"
+                  autoComplete="off"
                   required
                 />
               </div>
