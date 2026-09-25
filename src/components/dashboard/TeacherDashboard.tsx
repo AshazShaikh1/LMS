@@ -15,12 +15,14 @@ interface TeacherDashboardProps {
   profile: Profile
   teachingCourses?: (Course & { enrollmentCount?: number })[]
   pendingSubmissionsCount?: number
+  activeQuizzesCount?: number
 }
 
 export function TeacherDashboard({
   profile,
   teachingCourses = [],
   pendingSubmissionsCount = 0,
+  activeQuizzesCount = 0,
 }: TeacherDashboardProps) {
   const totalStudents = teachingCourses.reduce((sum, c) => sum + (c.enrollmentCount || 0), 0)
 
@@ -48,7 +50,7 @@ export function TeacherDashboard({
     },
     {
       label: 'Active Quizzes',
-      value: '0',
+      value: activeQuizzesCount.toString(),
       description: 'Published quiz evaluations',
       icon: FileText,
       color: 'text-purple-600 bg-purple-50 border-purple-100',

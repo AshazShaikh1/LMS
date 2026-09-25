@@ -13,6 +13,7 @@ import {
   Settings,
   FolderArchive,
   UserCircle,
+  HelpCircle,
   X
 } from 'lucide-react'
 
@@ -35,6 +36,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'My Courses', href: '/dashboard/courses', icon: BookOpen },
     { name: 'Assignments', href: '/dashboard/assignments', icon: FileText },
+    { name: 'Quizzes', href: '/dashboard/quizzes', icon: HelpCircle },
     { name: 'Grades', href: '/dashboard/grades', icon: GraduationCap },
     { name: 'Announcements', href: '/dashboard/announcements', icon: Bell },
     { name: 'Profile', href: '/dashboard/profile', icon: UserCircle },
@@ -44,6 +46,8 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Courses', href: '/dashboard/courses', icon: BookOpen },
     { name: 'Assignments', href: '/dashboard/assignments', icon: FileText },
+    { name: 'Gradebook', href: '/dashboard/grades', icon: GraduationCap },
+    { name: 'Quizzes', href: '/dashboard/quizzes', icon: HelpCircle },
     { name: 'Materials', href: '/dashboard/materials', icon: FolderArchive },
     { name: 'Announcements', href: '/dashboard/announcements', icon: Bell },
     { name: 'Profile', href: '/dashboard/profile', icon: UserCircle },
@@ -53,6 +57,8 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Users', href: '/dashboard/users', icon: Users },
     { name: 'Courses Oversight', href: '/dashboard/courses', icon: BookOpen },
+    { name: 'Gradebook', href: '/dashboard/grades', icon: GraduationCap },
+    { name: 'Quizzes', href: '/dashboard/quizzes', icon: HelpCircle },
     { name: 'System Settings', href: '/dashboard/settings', icon: Settings },
     { name: 'Profile', href: '/dashboard/profile', icon: UserCircle },
   ]

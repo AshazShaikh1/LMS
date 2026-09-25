@@ -114,3 +114,58 @@ export interface Submission {
   }
   assignment?: Assignment
 }
+
+export interface QuizQuestion {
+  id: string
+  quiz_id: string
+  question_text: string
+  options: string[]
+  correct_option_index: number
+  points: number
+  order_index: number
+  created_at: string
+}
+
+export interface QuizAttempt {
+  id: string
+  quiz_id: string
+  student_id: string
+  started_at: string
+  completed_at: string | null
+  score: number
+  total_points: number
+  percentage: number
+  passed: boolean
+  answers: Record<string, number>
+  student?: {
+    id: string
+    full_name: string | null
+    email: string
+  }
+}
+
+export interface Quiz {
+  id: string
+  course_id: string
+  teacher_id: string
+  title: string
+  description: string | null
+  time_limit_minutes: number
+  passing_score: number
+  created_at: string
+  updated_at: string
+  course?: {
+    id: string
+    title: string
+    category?: string
+  }
+  teacher?: {
+    id: string
+    full_name: string | null
+    email: string
+  }
+  questions?: QuizQuestion[]
+  attempts?: QuizAttempt[]
+  userAttempt?: QuizAttempt | null
+}
+

@@ -5,6 +5,7 @@ import { EnrollButton } from './EnrollButton'
 import { CourseMaterialsSection } from '@/components/dashboard/materials/CourseMaterialsSection'
 import { CourseAnnouncementsSection } from '@/components/dashboard/announcements/CourseAnnouncementsSection'
 import { CourseAssignmentsSection } from '@/components/dashboard/assignments/CourseAssignmentsSection'
+import { CourseQuizzesSection } from '@/components/dashboard/quizzes/CourseQuizzesSection'
 import {
   ArrowLeft,
   BookOpen,
@@ -139,6 +140,39 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
     userSubmission: a.submissions?.find((s: any) => s.student_id === user.id) || null,
   }))
 
+  // Fetch course quizzes & attempts (Phase 8)
+  const { data: quizzesData } = await supabase
+    .from('quizzes')
+    .select(`
+      *,
+      questions:quiz_questions(
+        id,
+        question_text,
+        options,
+        correct_option_index,
+        points
+      ),
+      attempts:quiz_attempts(
+        id,
+        student_id,
+        started_at,
+        completed_at,
+        score,
+        total_points,
+        percentage,
+        passed,
+        answers
+      )
+    `)
+    .eq('course_id', id)
+    .order('created_at', { ascending: false })
+
+  const rawQuizzes = quizzesData || []
+  const quizzes = rawQuizzes.map((q: any) => ({
+    ...q,
+    userAttempt: q.attempts?.find((att: any) => att.student_id === user.id) || null,
+  }))
+
   const formattedDate = new Date(course.created_at).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',
@@ -251,6 +285,14 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
             canManage={canManage}
             isEnrolled={isEnrolled}
             currentUserId={user.id}
+          />
+
+          {/* Integrated Course Quizzes Section (Phase 8) */}
+          <CourseQuizzesSection
+            courseId={course.id}
+            quizzes={quizzes}
+            canManage={canManage}
+            isEnrolled={isEnrolled}
           />
         </div>
 

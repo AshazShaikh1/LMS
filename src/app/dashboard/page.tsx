@@ -167,11 +167,23 @@ export default async function DashboardPage() {
       }
     }
 
+    // Count published quizzes across teacher's courses
+    let activeQuizzesCount = 0
+    if (teacherCourseIds.length > 0) {
+      const { count: quizCount } = await supabase
+        .from('quizzes')
+        .select('*', { count: 'exact', head: true })
+        .in('course_id', teacherCourseIds)
+
+      activeQuizzesCount = quizCount || 0
+    }
+
     return (
       <TeacherDashboard
         profile={profile}
         teachingCourses={coursesWithCounts}
         pendingSubmissionsCount={pendingGradingCount}
+        activeQuizzesCount={activeQuizzesCount}
       />
     )
   }
