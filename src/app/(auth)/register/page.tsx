@@ -3,6 +3,7 @@
 import { register } from '@/app/auth/actions'
 import Link from 'next/link'
 import { useState, useTransition } from 'react'
+import { ArrowLeft } from 'lucide-react'
 
 export default function RegisterPage() {
   const [error, setError] = useState('')
@@ -27,35 +28,103 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-gray-50">
-      <form onSubmit={handleSubmit} className="flex w-full max-w-sm flex-col space-y-4 border p-6 rounded-md shadow-sm bg-white">
-        <h1 className="text-2xl font-bold text-center">Student Registration</h1>
-        
-        {error && <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded border border-red-200">{error}</p>}
-        
-        <div className="flex flex-col space-y-1">
-          <label htmlFor="full_name" className="text-sm font-medium">Full Name</label>
-          <input id="full_name" name="full_name" type="text" required className="border p-2 rounded focus:outline-blue-500" />
+    <div className="flex min-h-screen flex-col justify-center px-4 py-8 sm:px-6 lg:px-8 bg-slate-50">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="mb-4 text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Home
+          </Link>
         </div>
 
-        <div className="flex flex-col space-y-1">
-          <label htmlFor="email" className="text-sm font-medium">Email</label>
-          <input id="email" name="email" type="email" required className="border p-2 rounded focus:outline-blue-500" />
+        <div className="flex justify-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 font-bold text-white shadow-md text-xl">
+            L
+          </span>
         </div>
-        
-        <div className="flex flex-col space-y-1">
-          <label htmlFor="password" className="text-sm font-medium">Password</label>
-          <input id="password" name="password" type="password" required className="border p-2 rounded focus:outline-blue-500" minLength={6} />
-        </div>
-        
-        <button type="submit" disabled={isPending} className="bg-green-600 text-white p-2 rounded hover:bg-green-700 transition disabled:opacity-50 font-medium">
-          {isPending ? 'Registering...' : 'Register'}
-        </button>
 
-        <p className="text-sm text-center mt-4 text-gray-600">
-          Already have an account? <Link href="/login" className="text-blue-600 hover:underline">Login here</Link>
+        <h2 className="mt-4 text-center text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+          Student Registration
+        </h2>
+        <p className="mt-1 text-center text-xs sm:text-sm text-slate-500">
+          Create your learner account to browse and enroll in courses
         </p>
-      </form>
+      </div>
+
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xs">
+          {error && (
+            <div className="mb-5 rounded-lg border border-red-200 bg-red-50 p-3 text-xs sm:text-sm text-red-800">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="full_name" className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Full Legal Name
+              </label>
+              <input
+                id="full_name"
+                name="full_name"
+                type="text"
+                required
+                placeholder="e.g. Jane Doe"
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-3 text-base sm:text-sm text-slate-900 shadow-xs focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Institutional / Student Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="student@university.edu"
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-3 text-base sm:text-sm text-slate-900 shadow-xs focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Password <span className="text-xs text-slate-400 font-normal">(min 6 characters)</span>
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                minLength={6}
+                placeholder="••••••••"
+                className="w-full rounded-xl border border-slate-300 px-3.5 py-3 text-base sm:text-sm text-slate-900 shadow-xs focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full flex items-center justify-center rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white shadow-xs hover:bg-emerald-700 transition disabled:opacity-50 min-h-[48px]"
+            >
+              {isPending ? 'Creating Account...' : 'Complete Registration'}
+            </button>
+          </form>
+
+          <div className="mt-6 border-t border-slate-100 pt-4 text-center">
+            <p className="text-xs sm:text-sm text-slate-600">
+              Already have an account?{' '}
+              <Link href="/login" className="font-semibold text-emerald-600 hover:underline">
+                Sign in here
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
