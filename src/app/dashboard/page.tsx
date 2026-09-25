@@ -188,6 +188,22 @@ export default async function DashboardPage() {
     )
   }
 
-  // Admin Dashboard
-  return <AdminDashboard profile={profile} />
+  // Admin Dashboard: Fetch institutional metrics
+  const [{ count: studentCount }, { count: teacherCount }, { count: courseCount }, { data: recentProfiles }] =
+    await Promise.all([
+      supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+      supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'teacher'),
+      supabase.from('courses').select('*', { count: 'exact', head: true }),
+      supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(5),
+    ])
+
+  return (
+    <AdminDashboard
+      profile={profile}
+      studentCount={studentCount || 0}
+      teacherCount={teacherCount || 0}
+      courseCount={courseCount || 0}
+      recentUsers={recentProfiles || []}
+    />
+  )
 }

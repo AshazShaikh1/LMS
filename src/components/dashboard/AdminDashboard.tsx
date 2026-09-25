@@ -13,27 +13,37 @@ import Link from 'next/link'
 
 interface AdminDashboardProps {
   profile: Profile
+  studentCount?: number
+  teacherCount?: number
+  courseCount?: number
+  recentUsers?: Profile[]
 }
 
-export function AdminDashboard({ profile }: AdminDashboardProps) {
+export function AdminDashboard({
+  profile,
+  studentCount = 0,
+  teacherCount = 0,
+  courseCount = 0,
+  recentUsers = [],
+}: AdminDashboardProps) {
   const stats = [
     {
       label: 'Registered Students',
-      value: '—',
+      value: studentCount.toString(),
       description: 'Active learner accounts',
       icon: GraduationCap,
       color: 'text-blue-600 bg-blue-50 border-blue-100',
     },
     {
       label: 'Instructors',
-      value: '—',
+      value: teacherCount.toString(),
       description: 'Verified faculty members',
       icon: Users,
       color: 'text-emerald-600 bg-emerald-50 border-emerald-100',
     },
     {
       label: 'Total Courses',
-      value: '0',
+      value: courseCount.toString(),
       description: 'Active academic catalogs',
       icon: BookOpen,
       color: 'text-purple-600 bg-purple-50 border-purple-100',
@@ -125,24 +135,36 @@ export function AdminDashboard({ profile }: AdminDashboardProps) {
             </Link>
           </div>
 
-          <div className="rounded-lg bg-slate-50 p-6 border border-slate-200 text-center">
-            <Users className="mx-auto h-8 w-8 text-slate-400 mb-2" />
-            <h3 className="text-sm font-semibold text-slate-800">
-              User Directory Ready
-            </h3>
-            <p className="mt-1 text-xs text-slate-500 max-w-md mx-auto">
-              Per requirements, students self-register as learners, while Teacher accounts are provisioned exclusively by Administrators.
-            </p>
-            <div className="mt-4 flex justify-center gap-3">
-              <Link
-                href="/dashboard/users"
-                className="inline-flex items-center gap-2 rounded-md bg-white border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-slate-50 transition"
-              >
-                <UserPlus className="h-3.5 w-3.5 text-purple-600" />
-                Provision Teacher Account
-              </Link>
+          {recentUsers.length > 0 ? (
+            <div className="divide-y divide-slate-100">
+              {recentUsers.slice(0, 5).map((u) => (
+                <div key={u.id} className="py-2.5 flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-700 text-[10px]">
+                      {(u.full_name || u.email || 'U')[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-slate-900">{u.full_name || 'Academic User'}</div>
+                      <div className="text-[11px] text-slate-400">{u.email}</div>
+                    </div>
+                  </div>
+                  <span className="capitalize font-semibold text-[11px] px-2 py-0.5 rounded-md border bg-slate-50 text-slate-700">
+                    {u.role}
+                  </span>
+                </div>
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="rounded-lg bg-slate-50 p-6 border border-slate-200 text-center">
+              <Users className="mx-auto h-8 w-8 text-slate-400 mb-2" />
+              <h3 className="text-sm font-semibold text-slate-800">
+                User Directory Ready
+              </h3>
+              <p className="mt-1 text-xs text-slate-500 max-w-md mx-auto">
+                Students self-register as learners, while Teacher accounts are provisioned exclusively by Administrators.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Right Column: System Controls */}
