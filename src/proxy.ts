@@ -64,14 +64,11 @@ export async function proxy(request: NextRequest) {
 
     // 2. Kill Switch Lockdown Enforcement: overrules all roles (students, teachers, admins, anonymous)
     if (isKillSwitchActive) {
-      // If the owner is visiting, allow them full access
-      if (!isOwner) {
-        // Allow access only to /system-offline and /system-control (so owner can login if needed)
-        if (pathname !== '/system-offline' && pathname !== '/system-control') {
-          const url = request.nextUrl.clone()
-          url.pathname = '/system-offline'
-          return NextResponse.redirect(url)
-        }
+      // Allow access only to /system-offline and /system-control (where owner can restore the site)
+      if (pathname !== '/system-offline' && pathname !== '/system-control') {
+        const url = request.nextUrl.clone()
+        url.pathname = '/system-offline'
+        return NextResponse.redirect(url)
       }
     } else {
       // If kill switch is NOT active, visiting /system-offline redirects back to home
