@@ -55,6 +55,8 @@ export default async function DashboardPage() {
     const enrolledCourseIds = enrolledCourses.map((c: any) => c.id)
 
     let announcements: any[] = []
+    let pendingAssignmentsCount = 0
+
     if (enrolledCourseIds.length > 0) {
       const { data: annData } = await supabase
         .from('announcements')
@@ -67,6 +69,24 @@ export default async function DashboardPage() {
         .limit(5)
 
       announcements = annData || []
+
+      // Fetch assignments to calculate pending assignments
+      const { data: courseAssignments } = await supabase
+        .from('assignments')
+        .select('id, due_date')
+        .in('course_id', enrolledCourseIds)
+
+      if (courseAssignments && courseAssignments.length > 0) {
+        const assignmentIds = courseAssignments.map((a) => a.id)
+        const { data: userSubs } = await supabase
+          .from('submissions')
+          .select('assignment_id')
+          .eq('student_id', user.id)
+          .in('assignment_id', assignmentIds)
+
+        const submittedIds = new Set((userSubs || []).map((s) => s.assignment_id))
+        pendingAssignmentsCount = courseAssignments.filter((a) => !submittedIds.has(a.id)).length
+      }
     }
 
     return (
@@ -74,6 +94,7 @@ export default async function DashboardPage() {
         profile={profile}
         enrolledCourses={enrolledCourses}
         announcements={announcements}
+        pendingAssignmentsCount={pendingAssignmentsCount}
       />
     )
   }
@@ -104,7 +125,34 @@ export default async function DashboardPage() {
       enrollmentCount: counts[c.id] || 0,
     }))
 
-    return <TeacherDashboard profile={profile} teachingCourses={coursesWithCounts} />
+    // Count all submissions received across teacher's assignments
+    const teacherCourseIds = (teachingCourses || []).map((c) => c.id)
+    let totalSubmissionsCount = 0
+
+    if (teacherCourseIds.length > 0) {
+      const { data: teacherAssignments } = await supabase
+        .from('assignments')
+        .select('id')
+        .in('course_id', teacherCourseIds)
+
+      if (teacherAssignments && teacherAssignments.length > 0) {
+        const assignIds = teacherAssignments.map((a) => a.id)
+        const { count } = await supabase
+          .from('submissions')
+          .select('*', { count: 'exact', head: true })
+          .in('assignment_id', assignIds)
+
+        totalSubmissionsCount = count || 0
+      }
+    }
+
+    return (
+      <TeacherDashboard
+        profile={profile}
+        teachingCourses={coursesWithCounts}
+        pendingSubmissionsCount={totalSubmissionsCount}
+      />
+    )
   }
 
   // Admin Dashboard

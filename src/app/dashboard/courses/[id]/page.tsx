@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { EnrollButton } from './EnrollButton'
 import { CourseMaterialsSection } from '@/components/dashboard/materials/CourseMaterialsSection'
 import { CourseAnnouncementsSection } from '@/components/dashboard/announcements/CourseAnnouncementsSection'
+import { CourseAssignmentsSection } from '@/components/dashboard/assignments/CourseAssignmentsSection'
 import {
   ArrowLeft,
   BookOpen,
@@ -110,6 +111,34 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
 
   const announcements = announcementsData || []
 
+  // Fetch course assignments & submissions (Phase 6)
+  const { data: assignmentsData } = await supabase
+    .from('assignments')
+    .select(`
+      *,
+      teacher:profiles!assignments_teacher_id_fkey(id, full_name, email),
+      submissions:submissions(
+        id,
+        assignment_id,
+        student_id,
+        file_path,
+        file_name,
+        file_size,
+        submitted_at,
+        marks,
+        feedback,
+        student:profiles!submissions_student_id_fkey(id, full_name, email)
+      )
+    `)
+    .eq('course_id', id)
+    .order('due_date', { ascending: true })
+
+  const rawAssignments = assignmentsData || []
+  const assignments = rawAssignments.map((a: any) => ({
+    ...a,
+    userSubmission: a.submissions?.find((s: any) => s.student_id === user.id) || null,
+  }))
+
   const formattedDate = new Date(course.created_at).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',
@@ -215,15 +244,14 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
             isEnrolled={isEnrolled}
           />
 
-          {/* Phase 6 Placeholder */}
-          <div className="rounded-xl border border-slate-200 bg-white p-5 text-center shadow-xs">
-            <FileText className="mx-auto h-6 w-6 text-emerald-500 mb-2" />
-            <div className="text-sm font-semibold text-slate-800">Assignments Hub</div>
-            <p className="text-xs text-slate-400 mt-1">Instructor assignment tasks, deadlines, student submissions &amp; grades</p>
-            <span className="mt-3 inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600">
-              Phase 6
-            </span>
-          </div>
+          {/* Integrated Course Assignments Section (Phase 6) */}
+          <CourseAssignmentsSection
+            courseId={course.id}
+            assignments={assignments}
+            canManage={canManage}
+            isEnrolled={isEnrolled}
+            currentUserId={user.id}
+          />
         </div>
 
         {/* Right Column: Instructor / Roster View */}

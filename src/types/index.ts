@@ -69,3 +69,48 @@ export interface Announcement {
     email: string
   }
 }
+
+export interface Assignment {
+  id: string
+  course_id: string
+  teacher_id: string
+  title: string
+  description: string | null
+  due_date: string
+  max_marks: number
+  created_at: string
+  updated_at: string
+  course?: {
+    id: string
+    title: string
+    category?: string
+  }
+  teacher?: {
+    id: string
+    full_name: string | null
+    email: string
+  }
+  submissions?: Submission[]
+  submission_count?: number
+  userSubmission?: Submission | null
+}
+
+export interface Submission {
+  id: string
+  assignment_id: string
+  student_id: string
+  file_path: string
+  file_name: string
+  file_size: number | null
+  submitted_at: string
+  marks: number | null
+  feedback: string | null
+  graded_at: string | null
+  graded_by: string | null
+  student?: {
+    id: string
+    full_name: string | null
+    email: string
+  }
+  assignment?: Assignment
+}

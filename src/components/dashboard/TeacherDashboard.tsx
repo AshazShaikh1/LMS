@@ -14,9 +14,14 @@ import Link from 'next/link'
 interface TeacherDashboardProps {
   profile: Profile
   teachingCourses?: (Course & { enrollmentCount?: number })[]
+  pendingSubmissionsCount?: number
 }
 
-export function TeacherDashboard({ profile, teachingCourses = [] }: TeacherDashboardProps) {
+export function TeacherDashboard({
+  profile,
+  teachingCourses = [],
+  pendingSubmissionsCount = 0,
+}: TeacherDashboardProps) {
   const totalStudents = teachingCourses.reduce((sum, c) => sum + (c.enrollmentCount || 0), 0)
 
   const stats = [
@@ -28,9 +33,9 @@ export function TeacherDashboard({ profile, teachingCourses = [] }: TeacherDashb
       color: 'text-emerald-600 bg-emerald-50 border-emerald-100',
     },
     {
-      label: 'Submissions to Grade',
-      value: '0',
-      description: 'Pending student submissions',
+      label: 'Total Submissions',
+      value: pendingSubmissionsCount.toString(),
+      description: 'Received student submissions',
       icon: ClipboardList,
       color: 'text-amber-600 bg-amber-50 border-amber-100',
     },

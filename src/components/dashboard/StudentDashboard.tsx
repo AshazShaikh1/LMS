@@ -15,12 +15,14 @@ interface StudentDashboardProps {
   profile: Profile
   enrolledCourses?: (Course & { enrollmentCount?: number })[]
   announcements?: Announcement[]
+  pendingAssignmentsCount?: number
 }
 
 export function StudentDashboard({
   profile,
   enrolledCourses = [],
   announcements = [],
+  pendingAssignmentsCount = 0,
 }: StudentDashboardProps) {
   const stats = [
     {
@@ -32,8 +34,8 @@ export function StudentDashboard({
     },
     {
       label: 'Pending Assignments',
-      value: '0',
-      description: 'Due in next 7 days',
+      value: pendingAssignmentsCount.toString(),
+      description: 'Awaiting submission',
       icon: FileCheck2,
       color: 'text-amber-600 bg-amber-50 border-amber-100',
     },
