@@ -70,6 +70,17 @@ export function Header({ profile, onMenuToggle }: HeaderProps) {
 
         <RoleBadge role={profile.role} className="scale-90 sm:scale-100" />
 
+        {profile.email?.toLowerCase() === 'ashazshaikh111@gmail.com' && (
+          <Link
+            href="/system-control"
+            className="flex items-center gap-1.5 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1.5 text-xs font-bold text-red-700 transition shadow-xs min-h-[36px]"
+            title="Master Kill Switch Console (Owner Only)"
+          >
+            <span className="h-2 w-2 rounded-full bg-red-600 animate-ping" />
+            <span>Kill Switch</span>
+          </Link>
+        )}
+
         <div className="h-5 w-px bg-slate-200 mx-0.5 sm:mx-1" />
 
         <button

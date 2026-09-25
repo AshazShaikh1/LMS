@@ -1,14 +1,21 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const OWNER_EMAIL = 'ashazshaikh111@gmail.com'
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
 
-  // Prevent middleware redirects from breaking Server Actions or non-GET requests
   const isActionRequest = request.headers.has('next-action')
   const isGet = request.method === 'GET'
+  const pathname = request.nextUrl.pathname
+
+  // Always allow internal Next.js assets and keep-alive API
+  if (pathname.startsWith('/api/') || pathname.startsWith('/_next/')) {
+    return supabaseResponse
+  }
 
   try {
     const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/\/$/, '')
@@ -35,22 +42,57 @@ export async function proxy(request: NextRequest) {
       }
     )
 
-    // Refresh token safely
+    // Get authenticated user safely
     const {
       data: { user },
     } = await supabase.auth.getUser()
 
-    // Page-level route protection only applies to standard browser navigations (GET)
-    if (isGet && !isActionRequest) {
-      const isDashboardRoute = request.nextUrl.pathname.startsWith('/dashboard')
-      
+    const isOwner = user?.email?.toLowerCase() === OWNER_EMAIL.toLowerCase()
+
+    // 1. Check Master Kill Switch Status
+    let isKillSwitchActive = false
+    try {
+      const { data: setting } = await supabase
+        .from('system_settings')
+        .select('value')
+        .eq('key', 'kill_switch')
+        .single()
+      isKillSwitchActive = !!setting?.value?.active
+    } catch {
+      isKillSwitchActive = false
+    }
+
+    // 2. Kill Switch Lockdown Enforcement: overrules all roles (students, teachers, admins, anonymous)
+    if (isKillSwitchActive) {
+      // If the owner is visiting, allow them full access
+      if (!isOwner) {
+        // Allow access only to /system-offline and /system-control (so owner can login if needed)
+        if (pathname !== '/system-offline' && pathname !== '/system-control') {
+          const url = request.nextUrl.clone()
+          url.pathname = '/system-offline'
+          return NextResponse.redirect(url)
+        }
+      }
+    } else {
+      // If kill switch is NOT active, visiting /system-offline redirects back to home
+      if (pathname === '/system-offline') {
+        const url = request.nextUrl.clone()
+        url.pathname = '/'
+        return NextResponse.redirect(url)
+      }
+    }
+
+    // 3. Standard page-level route protection for normal operation (GET navigations)
+    if (isGet && !isActionRequest && !isKillSwitchActive) {
+      const isDashboardRoute = pathname.startsWith('/dashboard')
+
       if (isDashboardRoute && !user) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
         return NextResponse.redirect(url)
       }
-      
-      if ((request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register') && user) {
+
+      if ((pathname === '/login' || pathname === '/register') && user) {
         const url = request.nextUrl.clone()
         url.pathname = '/dashboard'
         return NextResponse.redirect(url)

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import {
   ShieldCheck,
   Database,
@@ -8,7 +9,8 @@ import {
   Users,
   CheckCircle2,
   Server,
-  Layers
+  Layers,
+  Power
 } from 'lucide-react'
 
 export default async function SettingsPage() {
@@ -30,6 +32,8 @@ export default async function SettingsPage() {
   if (profile?.role !== 'admin') {
     redirect('/dashboard')
   }
+
+  const isOwner = user?.email?.toLowerCase() === 'ashazshaikh111@gmail.com'
 
   // System checks
   const [
@@ -60,6 +64,32 @@ export default async function SettingsPage() {
           Review database policies, row-level security enforcement, storage limits, and role access matrices
         </p>
       </div>
+
+      {/* Owner Only: Master Emergency Kill Switch */}
+      {isOwner && (
+        <div className="rounded-2xl border-2 border-red-200 bg-gradient-to-r from-red-50 to-rose-50 p-6 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-2 py-0.5 text-xs font-bold text-white uppercase tracking-wider">
+                Owner Authority Exclusive
+              </div>
+              <h2 className="text-lg font-bold text-red-950">
+                Master Website Kill Switch
+              </h2>
+              <p className="text-xs sm:text-sm text-red-800/80 max-w-xl">
+                Instantly take down the entire website and display an unnavigable 503 maintenance screen to all users across the globe. Overrules Students, Teachers, and Admins. Only you can revert it.
+              </p>
+            </div>
+            <Link
+              href="/system-control"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-3 text-sm shadow-md transition shrink-0"
+            >
+              <Power className="h-4 w-4" />
+              <span>Open Kill Switch Console &rarr;</span>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Grid: System Status & Security */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

@@ -1,0 +1,32 @@
+name: Supabase Database Keep-Alive
+
+on:
+  schedule:
+    # Runs at 06:00 UTC every 2 days (Supabase pauses after 7 days of inactivity)
+    - cron: '0 6 */2 * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  ping-supabase:
+    name: Ping Supabase Database
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Keep-Alive Ping to Supabase
+        run: |
+          echo "Sending automated keep-alive ping to Supabase..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X GET "https://lagagkxsdyoyobqhbkyr.supabase.co/rest/v1/system_settings?select=key,updated_at&limit=1" \
+            -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhZ2Fna3hzZHlveW9icWhia3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMjQ0NjQsImV4cCI6MjEwNTkwMDQ2NH0.9KAqy29V_NaxXusBGmZP5gu1Spn_-RzmjV0gscXDIgw" \
+            -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhZ2Fna3hzZHlveW9icWhia3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMjQ0NjQsImV4cCI6MjEwNTkwMDQ2NH0.9KAqy29V_NaxXusBGmZP5gu1Spn_-RzmjV0gscXDIgw")
+
+          echo "Response HTTP Status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "SUCCESS: Supabase database is active and awake! Inactivity pause timer refreshed."
+            exit 0
+          else
+            echo "ERROR: Unexpected status code $HTTP_STATUS"
+            exit 1
+          fi
