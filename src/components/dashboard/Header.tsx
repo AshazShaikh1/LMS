@@ -29,7 +29,10 @@ export function Header({ profile, onMenuToggle }: HeaderProps) {
     .toUpperCase()
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur-xs px-3 sm:px-6 lg:px-8">
+    <header
+      suppressHydrationWarning
+      className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur-xs px-3 sm:px-6 lg:px-8"
+    >
       {/* Left side: Hamburger button for mobile */}
       <div className="flex items-center gap-2 sm:gap-3">
         <button
