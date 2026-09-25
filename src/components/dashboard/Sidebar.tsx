@@ -93,9 +93,10 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
           </Link>
           <button
             onClick={onClose}
-            className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 lg:hidden"
+            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close menu"
           >
-            <X className="h-5 w-5" />
+            <X className="h-6 w-6" />
           </button>
         </div>
 
@@ -104,7 +105,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
           <div className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
             {role} workspace
           </div>
-          <nav className="space-y-1">
+          <nav className="space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
@@ -114,14 +115,14 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
                   key={item.name}
                   href={item.href}
                   onClick={() => onClose()}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3.5 rounded-xl px-3.5 py-3 text-base sm:text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-indigo-50 text-indigo-700'
+                      ? 'bg-indigo-50 text-indigo-700 font-semibold'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
                 >
                   <Icon
-                    className={`h-5 w-5 ${
+                    className={`h-5 w-5 shrink-0 ${
                       isActive ? 'text-indigo-600' : 'text-slate-400'
                     }`}
                   />

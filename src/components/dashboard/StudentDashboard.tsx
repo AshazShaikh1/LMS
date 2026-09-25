@@ -74,10 +74,10 @@ export function StudentDashboard({
               Track your enrolled courses, submit assignments, and review grades from your unified student dashboard.
             </p>
           </div>
-          <div className="flex shrink-0">
+          <div className="flex shrink-0 w-full sm:w-auto">
             <Link
               href="/dashboard/courses"
-              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white px-4 py-2.5 text-sm font-semibold shadow-sm transition"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white px-5 py-3 text-sm font-semibold shadow-sm transition"
             >
               Browse Course Catalog
               <ArrowRight className="h-4 w-4" />
